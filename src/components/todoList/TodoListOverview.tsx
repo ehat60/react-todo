@@ -1,13 +1,15 @@
 import * as React from 'react';
-import { getTodoLists, toggleTodoItem } from '../../todoApi';
+import { getTodoLists, toggleTodoItem, addTodoItem, addTodoList } from '../../todoApi';
 import { TodoListModel } from './todoListModel';
-import TodoListPresenter from './TodoListPresenter';
+import { TodoListOverviewPresenter } from './TodoListOverviewPresenter';
 
-export interface ITodoListOverviewProps {
+export interface ITodoListOverviewProps {    
 }
 
 export interface ITodoListOverviewState {
-    todoLists: Array<TodoListModel>;    
+    todoLists: Array<TodoListModel>;
+    newNames: Array<[string, string]>;
+    newTodoListName: string;
 }
 
 export default class TodoListOverview extends React.Component<ITodoListOverviewProps, ITodoListOverviewState> {
@@ -15,40 +17,56 @@ export default class TodoListOverview extends React.Component<ITodoListOverviewP
         super(props);
 
         this.state = {
-            todoLists: []
+            todoLists: [],
+            newNames: [],
+            newTodoListName: ""
         }
     }
 
     async componentDidMount() {
-        const lists = await getTodoLists();
-        this.setState({ todoLists: lists });
+        await this.loadLists();
     }
 
     public render() {
-        if (this.state.todoLists.length === 0) {
-            return <div>Spinner her</div>
-        }
-        return (
-            <div>
-                {this.state.todoLists.map(t => (
-                    <TodoListPresenter
-                        todoList={t}
-                        key={t.id}
-                        onItemToggle={id => {
-                            const lists = this.state.todoLists;
-                            let list = lists.filter(t => t.items.some(i => i.id === id))[0]
-                            let item = list.items.filter(i => i.id === id)[0];
-                            item.checked = !item.checked;
-                            this.setState({ todoLists: lists })
 
-                            toggleTodoItem(id);
-                        }}
-                        onNewItemNameChanged={newName => {
-                            
-                        }} 
-                    />
-                ))}
-            </div>
+        return (
+            <TodoListOverviewPresenter
+                todoLists={this.state.todoLists}
+                newTodoListName={this.state.newTodoListName}
+                onItemToggle={id => {
+                    const lists = this.state.todoLists;
+                    let list = lists.filter(t => t.items.some(i => i.id === id))[0]
+                    let item = list.items.filter(i => i.id === id)[0];
+                    item.checked = !item.checked;
+                    this.setState({ todoLists: lists })
+
+                    toggleTodoItem(id);
+                }}
+                onNewItemNameChanged={async (listId, name) => {
+                    await addTodoItem(listId, name);
+                    this.loadLists();
+                }}
+                onNewTodoListNameChanged={name => {
+                    this.setState({newTodoListName: name});
+                }}
+                onAddNewTodoList={async () => {
+                    await addTodoList(this.state.newTodoListName);
+                    this.loadLists();
+                }}
+            />
         );
+    }
+
+    changeList(id: string, changeFunc: (list: TodoListModel) => void) {
+        const lists = this.state.todoLists;
+        let list = lists.filter(t => t.items.some(i => i.id === id))[0]
+        let item = list.items.filter(i => i.id === id)[0];
+        item.checked = !item.checked;
+        this.setState({ todoLists: lists })
+    }
+
+    private async loadLists() {
+        const lists = await getTodoLists();
+        this.setState({ todoLists: lists });
     }
 }
