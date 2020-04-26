@@ -33,9 +33,8 @@ export function TodoListOverviewPresenter(props: ITodoListOverviewPresenterProps
                 </Button>
             </div>
             <Row>
-
                 {props.todoLists.map(t => (
-                    <Col md={6} key={t.id}>
+                    <Col md={6} key={t.id} className={styles.card}>
                         <TodoListPresenter
                             todoList={t}
                             onItemToggle={props.onItemToggle}
