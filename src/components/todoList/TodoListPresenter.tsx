@@ -12,7 +12,6 @@ interface TodoListProps {
 }
 
 function TodoListPresenter(props: TodoListProps) {
-
     const items = props.todoList.items.map((item, i) => (
         <ListGroup.Item key={i}>
             <Checkbox label={item.name} checked={item.checked} onChange={_ => props.onItemToggle(item.id)} />
@@ -24,7 +23,6 @@ function TodoListPresenter(props: TodoListProps) {
             <Card>
                 <Card.Header>{props.todoList.name}</Card.Header>
                 <ListGroup variant="flush">
-
                     {items}
                 </ListGroup>
                 <ListGroup variant="flush">
@@ -42,7 +40,6 @@ function TodoListPresenter(props: TodoListProps) {
                 </ListGroup>
             </Card>
         </div>
-
     );
 }
 

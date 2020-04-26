@@ -28,7 +28,6 @@ export default class TodoListOverview extends React.Component<ITodoListOverviewP
     }
 
     public render() {
-
         return (
             <TodoListOverviewPresenter
                 todoLists={this.state.todoLists}
@@ -55,14 +54,6 @@ export default class TodoListOverview extends React.Component<ITodoListOverviewP
                 }}
             />
         );
-    }
-
-    changeList(id: string, changeFunc: (list: TodoListModel) => void) {
-        const lists = this.state.todoLists;
-        let list = lists.filter(t => t.items.some(i => i.id === id))[0]
-        let item = list.items.filter(i => i.id === id)[0];
-        item.checked = !item.checked;
-        this.setState({ todoLists: lists })
     }
 
     private async loadLists() {
